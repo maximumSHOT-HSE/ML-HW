@@ -29,5 +29,30 @@ def train_test_split(
     return X[:train_size], y[:train_size], X[train_size:], y[train_size:]
 
 
-# X, y = read_cancer_dataset('resources/cancer.csv')
-# X, y = read_spam_dataset('resources/spam.csv')
+def get_precision_recall_accuracy(y_pred: list, y_true: list) -> typing.Tuple[typing.List, typing.List, float]:
+    assert len(y_pred) == len(y_true)
+    n = len(y_pred)
+    assert n > 0
+
+    accuracy = sum(1 for yp, yt in zip(y_pred, y_true) if yp == yt) / n
+    classes = set(y_true + y_pred)
+    cn = len(classes)
+
+    precision = [0.0] * cn
+    recall = [0.0] * cn
+
+    for i, y in enumerate(classes):
+        tp = sum(1 for yp, yt in zip(y_pred, y_true) if yp == y and yt == y)  # true positive
+        fp = sum(1 for yp, yt in zip(y_pred, y_true) if yp == y and yt != y)  # false positive
+        fn = sum(1 for yp, yt in zip(y_pred, y_true) if yp != y and yt == y)  # false negative
+        precision[i] = tp / (tp + fp)
+        recall[i] = tp / (tp + fn)
+
+    return precision, recall, accuracy
+
+
+if __name__ == '__main__':
+    X, y = read_cancer_dataset('resources/cancer.csv')
+    # X, y = read_spam_dataset('resources/spam.csv')
+    x_train, y_train, x_test, y_test = train_test_split(X, y, 0.9)
+    get_precision_recall_accuracy(y_train, y_train)
