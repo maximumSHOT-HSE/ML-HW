@@ -9,9 +9,9 @@ def get_dist(a: np.ndarray, b: np.ndarray):
 
 class Point:
 
-    def __init__(self, vector, id):
+    def __init__(self, vector, i):
         self.vector = vector
-        self.id = id
+        self.id = i
 
     def get_dist(self, o: np.ndarray):
         return get_dist(self.vector, o)
@@ -31,9 +31,9 @@ class Node:
         self.axis = axis
         self.axis_value = axis_value
         self.points_number = points_number
+        self.points = points
         self.left_son = left_son
         self.right_son = right_son
-        self.points = points
 
         self.box_center = np.array([])
         self.box_radius = 0
@@ -52,7 +52,15 @@ class Node:
 
 class KDTree:
 
-    def build_tree(self, points: typing.List[Point], axis: int, dimension: int, leaf_size: int) -> Node:
+    def build_tree(
+            self,
+            points: typing.List[Point],
+            axis: int,
+            dimension: int,
+            leaf_size: int
+    ) -> typing.Optional[Node]:
+        if len(points) == 0:
+            return None
         pivot = float(np.median(np.array([p.vector[axis] for p in points])))
         points_number = len(points)
 
@@ -101,7 +109,7 @@ class KDTree:
         radius, knn = self.update_knn(self.root, [], k, point, radius)
         return knn
 
-    def __init__(self, points: np.ndarray, leaf_size:int=40):
+    def __init__(self, points: np.ndarray, leaf_size: int = 40):
         points = [Point(vector, i) for i, vector in enumerate(points)]
         points_number = len(points)
         assert points_number > 0
@@ -109,10 +117,12 @@ class KDTree:
         assert dimension > 0
         self.root = self.build_tree(points, 0, dimension, leaf_size)
 
-    def query(self, xs: np.ndarray, k=1, return_distance=True):
+    def query(self, xs: np.ndarray, k=1, return_distance=True) -> typing.List[typing.List[typing.Tuple[int, float]]]:
         if self.root.points_number >= k:
             result = [self.find_knn(x, k) for x in xs]
         else:
             result = [self.root.points for _ in xs]
         if return_distance:
             return [[(p.id, p.get_dist(xs[i])) for p in knn] for i, knn in enumerate(result)]
+        else:
+            return [[p.id for p in knn] for knn in result]
