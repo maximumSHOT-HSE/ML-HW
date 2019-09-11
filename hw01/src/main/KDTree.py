@@ -124,7 +124,7 @@ class KDTree:
         assert dimension > 0
         self.root = self.build_tree(points, 0, dimension, leaf_size)
 
-    def query(self, xs: np.ndarray, k=1, return_distance=True) -> typing.List[typing.List[typing.Tuple[int, float]]]:
+    def query(self, xs: np.ndarray, k=1, return_distance=True):
         if self.root.points_number >= k:
             result = [self.find_knn(x, k) for x in xs]
         else:
