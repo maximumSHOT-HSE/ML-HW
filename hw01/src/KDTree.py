@@ -64,7 +64,8 @@ class KDTree:
             points: typing.List[Point],
             axis: int,
             dimension: int,
-            leaf_size: int
+            leaf_size: int,
+            depth: int = 0
     ) -> typing.Optional[Node]:
         if len(points) == 0:
             return None
@@ -77,17 +78,29 @@ class KDTree:
         left_part = [p for p in points if p.vector[axis] < pivot]
         right_part = [p for p in points if p.vector[axis] >= pivot]
 
-        left_son = self.build_tree(left_part, (axis + 1) % dimension, dimension, leaf_size)
-        right_son = self.build_tree(right_part, (axis + 1) % dimension, dimension, leaf_size)
+        if len(left_part) == 0 or len(right_part) == 0:
+            return Node(axis, pivot, points_number, points=points)
+
+        left_son = self.build_tree(left_part, (axis + 1) % dimension, dimension, leaf_size, depth + 1)
+        right_son = self.build_tree(right_part, (axis + 1) % dimension, dimension, leaf_size, depth + 1)
 
         return Node(axis, pivot, points_number, left_son, right_son, points)
+
+    def __init__(self, points: np.ndarray, leaf_size: int = 40):
+        points = [Point(vector, i) for i, vector in enumerate(points)]
+        points_number = len(points)
+        assert points_number > 0
+        dimension = points[0].vector.shape[0]
+        assert dimension > 0
+        self.root = self.build_tree(points, 0, dimension, leaf_size)
+        self.cnt = 0
 
     def find_circle_boundary(self, point: np.ndarray, node: Node, k: int):
         node_to = node.left_son if point[node.axis] < node.axis_value else node.right_son
         if node_to and node_to.points_number >= k:
             return self.find_circle_boundary(point, node_to, k)
         node.points.sort(key=lambda p: p.get_dist(point))  # TODO: can be done in O(n)
-        return node.points[min(k, len(node.points)) - 1].get_dist(point)
+        return node.points[min(k, len(node.points)) - 1].get_dist(point), node.points[:min(k, len(node.points))]
 
     def update_knn(
             self,
@@ -111,18 +124,12 @@ class KDTree:
         return radius, current_knn
 
     def find_knn(self, point: np.ndarray, k: int) -> typing.List[Point]:
+        self.cnt += 1
+        print(self.cnt)
         assert self.root.points_number >= k
-        radius = self.find_circle_boundary(point, self.root, k)
+        radius, knn = self.find_circle_boundary(point, self.root, k)
         radius, knn = self.update_knn(self.root, [], k, point, radius)
         return knn
-
-    def __init__(self, points: np.ndarray, leaf_size: int = 40):
-        points = [Point(vector, i) for i, vector in enumerate(points)]
-        points_number = len(points)
-        assert points_number > 0
-        dimension = points[0].vector.shape[0]
-        assert dimension > 0
-        self.root = self.build_tree(points, 0, dimension, leaf_size)
 
     def query(self, xs: np.ndarray, k=1, return_distance=True):
         if self.root.points_number >= k:

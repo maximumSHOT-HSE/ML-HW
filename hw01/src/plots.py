@@ -12,6 +12,7 @@ def plot_precision_recall(x_train: list, y_train: list, x_test: list, y_test: li
     recalls = [[] for _ in range(classes)]
     accuracies = []
     for k in ks:
+        print(k)
         classifier = KNearest(k)
         classifier.fit(x_train, y_train)
         y_pred = classifier.predict(x_test)
