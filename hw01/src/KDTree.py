@@ -75,11 +75,9 @@ class KDTree:
         if points_number <= leaf_size:
             return Node(axis, pivot, points_number, points=points)
 
-        left_part = [p for p in points if p.vector[axis] < pivot]
-        right_part = [p for p in points if p.vector[axis] >= pivot]
-
-        if len(left_part) == 0 or len(right_part) == 0:
-            return Node(axis, pivot, points_number, points=points)
+        points.sort(key=lambda p: p.vector[axis])
+        left_part = points[:points_number // 2]
+        right_part = points[points_number // 2:]
 
         left_son = self.build_tree(left_part, (axis + 1) % dimension, dimension, leaf_size, depth + 1)
         right_son = self.build_tree(right_part, (axis + 1) % dimension, dimension, leaf_size, depth + 1)
