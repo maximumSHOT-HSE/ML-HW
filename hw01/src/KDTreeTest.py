@@ -1,6 +1,6 @@
 import numpy as np
 
-from KDTree import KDTree
+from src.KDTree import KDTree
 
 
 def check_correctness():

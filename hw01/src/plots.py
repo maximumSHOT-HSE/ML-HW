@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from KNearest import KNearest
-from utils import *
+from src.KNearest import KNearest
+from src.utils import *
 
 
 def plot_precision_recall(x_train: list, y_train: list, x_test: list, y_test: list, max_k=30):

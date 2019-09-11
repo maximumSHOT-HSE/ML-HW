@@ -1,5 +1,5 @@
-from KDTree import KDTree
-from plots import *
+from src.KDTree import KDTree
+from src.plots import *
 
 
 class KNearest:

@@ -1,4 +1,4 @@
-from plots import *
+from src.plots import *
 
 
 X, y = read_cancer_dataset('resources/cancer.csv')
