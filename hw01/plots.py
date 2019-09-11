@@ -1,38 +1,8 @@
-import sys
-
 import matplotlib.pyplot as plt
 import numpy as np
 
-from src.main.KDTree import KDTree
-from src.main.utils import *
-
-
-class KNearest:
-
-    def __init__(self, n_neighbors: int = 5, leaf_size: int = 30):
-        self.k = n_neighbors
-        self.leaf_size = leaf_size
-        self.kd_tree = None
-        self.labels = None
-        self.ys = None
-
-    def fit(self, xs: list, ys: list):
-        self.kd_tree = KDTree(np.array(xs), self.leaf_size)
-        self.ys = ys
-        self.labels = list(set(ys))
-
-    def predict_probabilities(self, xs: list) -> np.ndarray:
-        predicted_ys = self.kd_tree.query(xs, self.k, False)
-        ps = [[]] * len(xs)
-        for i in range(len(xs)):
-            ps[i] = [0.0] * len(self.labels)
-            for y in predicted_ys[i]:
-                ps[i][self.ys[y]] += 1
-            ps[i] = [p / len(predicted_ys[i]) for p in ps[i]]
-        return np.array(ps)
-
-    def predict(self, xs: list):
-        return np.argmax(self.predict_probabilities(xs), axis=1).tolist()
+from KNearest import KNearest
+from utils import *
 
 
 def plot_precision_recall(x_train: list, y_train: list, x_test: list, y_test: list, max_k=30):
@@ -102,16 +72,3 @@ def plot_roc_curve(x_train, y_train, x_test, y_test, max_k=30):
     plt.ylim(-0.01, 1.01)
     plt.tight_layout()
     plt.show()
-
-
-# X, y = read_cancer_dataset('../resources/cancer.csv')
-# X_train, y_train, X_test, y_test = train_test_split(X, y, 0.9)
-# plot_precision_recall(X_train, y_train, X_test, y_test)
-# plot_roc_curve(X_train, y_train, X_test, y_test, max_k=10)
-
-sys.setrecursionlimit(2000)
-
-X, y = read_spam_dataset("../resources/spam.csv")
-X_train, y_train, X_test, y_test = train_test_split(X, y, 0.5)
-plot_precision_recall(X_train, y_train, X_test, y_test, max_k=20)
-# plot_roc_curve(X_train, y_train, X_test, y_test, max_k=20)
