@@ -10,7 +10,7 @@ import typing
 def read_cancer_dataset(path_to_csv: str) -> typing.Tuple[typing.List, typing.List]:
     data = pandas.read_csv(path_to_csv).values.tolist()
     random.shuffle(data)
-    return [row[1:] for row in data], [row[0] for row in data]
+    return [row[1:] for row in data], [(1 if row[0] == 'M' else 0) for row in data]
 
 
 def read_spam_dataset(path_to_csv: str) -> typing.Tuple[typing.List, typing.List]:
@@ -20,13 +20,13 @@ def read_spam_dataset(path_to_csv: str) -> typing.Tuple[typing.List, typing.List
 
 
 def train_test_split(
-        X: typing.List,
-        y: typing.List,
+        xs: typing.List,
+        ys: typing.List,
         ratio: float
 ) -> typing.Tuple[typing.List, typing.List, typing.List, typing.List]:
-    assert len(X) == len(y)
-    train_size = int(ratio * len(X))
-    return X[:train_size], y[:train_size], X[train_size:], y[train_size:]
+    assert len(xs) == len(ys)
+    train_size = int(ratio * len(xs))
+    return xs[:train_size], ys[:train_size], xs[train_size:], ys[train_size:]
 
 
 def get_precision_recall_accuracy(y_pred: list, y_true: list) -> typing.Tuple[typing.List, typing.List, float]:
@@ -52,7 +52,9 @@ def get_precision_recall_accuracy(y_pred: list, y_true: list) -> typing.Tuple[ty
 
 
 if __name__ == '__main__':
-    X, y = read_cancer_dataset('resources/cancer.csv')
+    pass
+    # X, y = read_cancer_dataset('resources/cancer.csv')
     # X, y = read_spam_dataset('resources/spam.csv')
-    x_train, y_train, x_test, y_test = train_test_split(X, y, 0.9)
-    get_precision_recall_accuracy(y_train, y_train)
+    # x_train, y_train, x_test, y_test = train_test_split(X, y, 0.9)
+    # get_precision_recall_accuracy(y_train, y_train)
+    # print(y_train)
