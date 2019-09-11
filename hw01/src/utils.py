@@ -46,12 +46,3 @@ def get_precision_recall_accuracy(y_pred: list, y_true: list) -> typing.Tuple[ty
         recall[i] = tp / (tp + fn)
 
     return precision, recall, accuracy
-
-
-if __name__ == '__main__':
-    pass
-    # X, y = read_cancer_dataset('resources/cancer.csv')
-    # X, y = read_spam_dataset('resources/spam.csv')
-    # x_train, y_train, x_test, y_test = train_test_split(X, y, 0.9)
-    # get_precision_recall_accuracy(y_train, y_train)
-    # print(y_train)

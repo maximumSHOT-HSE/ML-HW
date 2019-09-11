@@ -16,8 +16,8 @@ def check_correctness():
     x_train = np.random.randn(100, 20)
     x_test = np.random.randn(100, 20)
     tree = KDTree(x_train, leaf_size=2)
-    predicted = tree.query(x_test, k=4, return_distance=False)
-    true = true_closest(x_train, x_test, k=4)
+    predicted = tree.query(x_test, k=10, return_distance=False)
+    true = true_closest(x_train, x_test, k=10)
 
     predicted = [list(sorted(l)) for l in predicted]
     true = [list(sorted(l)) for l in true]
@@ -40,7 +40,6 @@ def execute_max_test():
     x_train = np.random.randn(1000, 20)
     x_test = np.random.randn(1000, 20)
     tree = KDTree(x_train, leaf_size=2)
-    # predicted = true_closest(x_train, x_test, k=4)
     predicted = tree.query(x_test, k=4)
 
     predicted = [list(sorted(l)) for l in predicted]
@@ -48,5 +47,6 @@ def execute_max_test():
     print(np.array(predicted))
 
 
-check_correctness()
-execute_max_test()
+if __name__ == '__main__':
+    check_correctness()
+    execute_max_test()

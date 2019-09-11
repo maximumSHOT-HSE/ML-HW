@@ -46,13 +46,6 @@ class Node:
         self.box_center = (down_boundary + up_boundary) / 2
         self.box_radius = get_dist(self.box_center, down_boundary)
 
-    # def check_intersection(self, center: np.ndarray, radius: float) -> bool:
-    #     r1 = np.array([self.box_radius] * self.box_center.shape[0])
-    #     r2 = np.array([radius] * center.shape[0])
-    #     x = np.array([self.box_center - r1, center - r2]).max(axis=0)
-    #     y = np.array([self.box_center + r1, center + r2]).min(axis=0)
-    #     return (x <= y).all()
-
     def check_intersection(self, center: np.ndarray, radius: float) -> bool:
         return get_dist(self.box_center, center) <= self.box_radius + radius
 
@@ -75,7 +68,8 @@ class KDTree:
         if points_number <= leaf_size:
             return Node(axis, pivot, points_number, points=points)
 
-        points.sort(key=lambda p: p.vector[axis])
+        points = [p for p in points if p.vector[axis] < pivot] + [p for p in points if p.vector[axis] >= pivot]
+
         left_part = points[:points_number // 2]
         right_part = points[points_number // 2:]
 
@@ -91,13 +85,12 @@ class KDTree:
         dimension = points[0].vector.shape[0]
         assert dimension > 0
         self.root = self.build_tree(points, 0, dimension, leaf_size)
-        self.cnt = 0
 
     def find_circle_boundary(self, point: np.ndarray, node: Node, k: int):
         node_to = node.left_son if point[node.axis] < node.axis_value else node.right_son
         if node_to and node_to.points_number >= k:
             return self.find_circle_boundary(point, node_to, k)
-        node.points.sort(key=lambda p: p.get_dist(point))  # TODO: can be done in O(n)
+        node.points.sort(key=lambda p: p.get_dist(point))
         return node.points[min(k, len(node.points)) - 1].get_dist(point), node.points[:min(k, len(node.points))]
 
     def update_knn(
@@ -122,11 +115,10 @@ class KDTree:
         return radius, current_knn
 
     def find_knn(self, point: np.ndarray, k: int) -> typing.List[Point]:
-        self.cnt += 1
-        print(self.cnt)
         assert self.root.points_number >= k
         radius, knn = self.find_circle_boundary(point, self.root, k)
         radius, knn = self.update_knn(self.root, [], k, point, radius)
+        print(len(knn), 'k = ', k)
         return knn
 
     def query(self, xs: np.ndarray, k=1, return_distance=True):
