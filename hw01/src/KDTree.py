@@ -68,7 +68,9 @@ class KDTree:
         if points_number <= leaf_size:
             return Node(axis, pivot, points_number, points=points)
 
-        points = [p for p in points if p.vector[axis] < pivot] + [p for p in points if p.vector[axis] >= pivot]
+        points = [p for p in points if p.vector[axis] < pivot] +\
+                 [p for p in points if p.vector[axis] == pivot] +\
+                 [p for p in points if p.vector[axis] > pivot]
 
         left_part = points[:points_number // 2]
         right_part = points[points_number // 2:]
@@ -118,7 +120,6 @@ class KDTree:
         assert self.root.points_number >= k
         radius, knn = self.find_circle_boundary(point, self.root, k)
         radius, knn = self.update_knn(self.root, [], k, point, radius)
-        print(len(knn), 'k = ', k)
         return knn
 
     def query(self, xs: np.ndarray, k=1, return_distance=True):
