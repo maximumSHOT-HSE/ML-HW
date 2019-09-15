@@ -63,5 +63,5 @@ def zero_one_scale(xs: list) -> list:
 
 
 def max_abs_scale(xs: list) -> list:
-    M = max(abs(x) for x in xs)
-    return [x / M for x in xs]
+    m = np.array([abs(x) for x in xs]).max()
+    return [x / m for x in xs]
