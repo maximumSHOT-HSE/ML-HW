@@ -57,8 +57,8 @@ def standard_scale(xs: np.ndarray) -> np.ndarray:
 
 # scale [min, max] to [0, 1]
 def zero_one_scale(xs: np.ndarray) -> np.ndarray
-    _min = np.array(xs).min(axis=0)
-    _max = np.array(xs).max(axis=0)
+    _min = xs.min(axis=0)
+    _max = xs.max(axis=0)
     return (xs - _min) / (_max - _min)
 
 
