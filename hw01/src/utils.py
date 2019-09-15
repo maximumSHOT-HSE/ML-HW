@@ -49,19 +49,19 @@ def get_precision_recall_accuracy(y_pred: list, y_true: list) -> typing.Tuple[ty
     return precision, recall, accuracy
 
 
-def standard_scale(xs: list) -> list:
-    mean = np.mean(np.array(xs))
-    std = np.std(np.array(xs))
-    return [(x - mean) / std for x in xs]
+def standard_scale(xs: np.ndarray) -> np.ndarray:
+    mean = np.mean(xs, axis=0)
+    std = np.std(xs, axis=0)
+    return (xs - mean) / std
 
 
 # scale [min, max] to [0, 1]
-def zero_one_scale(xs: list) -> list:
-    m = np.array(xs).min()
-    M = np.array(xs).max()
-    return [(x - m) / (M - m) for x in xs]
+def zero_one_scale(xs: np.ndarray) -> np.ndarray
+    _min = np.array(xs).min(axis=0)
+    _max = np.array(xs).max(axis=0)
+    return (xs - _min) / (_max - _min)
 
 
-def max_abs_scale(xs: list) -> list:
-    m = np.array([abs(x) for x in xs]).max()
-    return [x / m for x in xs]
+def max_abs_scale(xs: np.ndarray) -> np.ndarray:
+    _max_abs = np.abs(xs).max()
+    return xs / _max_abs
