@@ -63,5 +63,5 @@ def zero_one_scale(xs: np.ndarray) -> np.ndarray
 
 
 def max_abs_scale(xs: np.ndarray) -> np.ndarray:
-    _max_abs = np.abs(xs).max()
+    _max_abs = np.abs(xs).max(axis=0)
     return xs / _max_abs
