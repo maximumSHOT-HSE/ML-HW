@@ -2,6 +2,7 @@ import random
 import typing
 
 import pandas
+import numpy as np
 
 
 def read_cancer_dataset(path_to_csv: str) -> typing.Tuple[typing.List, typing.List]:
@@ -46,3 +47,22 @@ def get_precision_recall_accuracy(y_pred: list, y_true: list) -> typing.Tuple[ty
         recall[i] = tp / (tp + fn)
 
     return precision, recall, accuracy
+
+
+def standard_scale(xs: list) -> list:
+    mean = np.mean(np.array(xs))
+    std = np.std(np.array(xs))
+    return [(x - mean) / std for x in xs]
+
+
+# scale [min, max] to [0, 1]
+def zero_one_scale(xs: list) -> list:
+    m = min(xs)
+    M = max(xs)
+    return [(x - m) / (M - m) for x in xs]
+
+
+def max_abs_scale(xs: list) -> list:
+    M = max(abs(x) for x in xs)
+    return [x / M for x in xs]
+
