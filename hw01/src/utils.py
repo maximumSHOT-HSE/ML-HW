@@ -57,12 +57,11 @@ def standard_scale(xs: list) -> list:
 
 # scale [min, max] to [0, 1]
 def zero_one_scale(xs: list) -> list:
-    m = min(xs)
-    M = max(xs)
+    m = np.array(xs).min()
+    M = np.array(xs).max()
     return [(x - m) / (M - m) for x in xs]
 
 
 def max_abs_scale(xs: list) -> list:
     M = max(abs(x) for x in xs)
     return [x / M for x in xs]
-
