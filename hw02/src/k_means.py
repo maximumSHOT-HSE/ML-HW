@@ -61,4 +61,8 @@ class KMeans:
     def predict(self, xs: np.ndarray):
         kd_tree = KDTree(self.centroids)
         _, i = kd_tree.query(xs)
-        return i[:, 0]
+        result = i[:, 0]
+        if np.unique(result).shape[0] != self.n_clusters:
+            return self.predict(xs)
+        else:
+            return result
