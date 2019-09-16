@@ -21,6 +21,7 @@ class KMeans:
         self.init = init
         self.max_iter = max_iter
         self.centroids = None
+        self.kd_tree = None
 
     def sample_init(self, xs: np.ndarray):
         self.centroids = xs.copy()
@@ -59,8 +60,9 @@ class KMeans:
             raise Exception(f'Unrecognised init type: {self.init}')
 
     def predict(self, xs: np.ndarray):
-        kd_tree = KDTree(self.centroids)
-        _, i = kd_tree.query(xs)
+        if not self.kd_tree:
+            self.kd_tree = KDTree(self.centroids)
+        _, i = self.kd_tree.query(xs)
         result = i[:, 0]
         if np.unique(result).shape[0] != self.n_clusters:
             return self.predict(xs)
