@@ -40,3 +40,21 @@ def clusters_statistics(flatten_image, cluster_colors, cluster_labels):
             a.set_xlim(0, 1)
             a.set_ylim(0, 1)
     plt.show()
+
+
+def read_image(path: str):
+    raise NotImplementedError()
+
+
+def show_image(image):
+    plt.figure(figsize=np.array(image.shape[:-1]) / 50)
+    plt.imshow(image)
+    plt.axis('off')
+    plt.tight_layout()
+    plt.show()
+
+
+def save_image(image, path):
+    raise NotImplementedError()
+
+
