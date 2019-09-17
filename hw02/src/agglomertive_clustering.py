@@ -48,7 +48,7 @@ class AgglomerativeClustering:
                     raise Exception(f'Unrecognized linkage type: {self.linkage}')
                 dists[q][k] = dists[k][q] = d_now_k
 
-        if not ys:
+        if ys is None:
             current_cluster_label = 0
             ys = [0] * n_xs
             for i in range(n_xs):

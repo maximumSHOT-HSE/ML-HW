@@ -2,11 +2,20 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
+from src.k_means import KMeans
+
 
 def visualize_clasters(X, labels):
+    label_id = {}
+    current_label_id = 0
+    for l in labels:
+        if l not in label_id:
+            label_id[l] = current_label_id
+            current_label_id += 1
+
     unique_labels = np.unique(labels)
     unique_colors = np.random.random((len(unique_labels), 3))
-    colors = [unique_colors[l] for l in labels]
+    colors = [unique_colors[label_id[l]] for l in labels]
     plt.figure(figsize=(9, 9))
     plt.scatter(X[:, 0], X[:, 1], c=colors)
     plt.show()
@@ -50,3 +59,32 @@ def show_image(image):
 
 def save_image(image, path):
     cv2.imwrite(path, np.flip(image, 2))
+
+
+def clusterize_image(image):
+    cluster_colors = None  # color of each cluster
+    clusters = None  # Cluster labels for each pixel in flattened image
+    recolored = None  # Image with pixel colors assigned to corresponding cluster colors
+
+    height, width, color_bytes = image.shape
+
+    xs = np.array([[[i, j] for j in range(width)] for i in range(height)]).reshape((height * width, 2))
+    ys = image.reshape((height * width, color_bytes))
+
+    mean = np.mean(xs, axis=0)
+    std = np.std(xs, axis=0)
+
+    xs = (xs - mean) / std
+
+    kmeans = KMeans(n_clusters=16, init='k-means++')
+    kmeans.fit(xs, ys)
+
+    labels = kmeans.predict(xs)
+
+    # print(labels)
+    # print(labels.shape)
+
+    return labels.reshape((height, width, color_bytes))
+
+    # clusters_statistics(image.reshape(-1, 3), cluster_colors, clusters)  # Very slow (:
+    # return recolored

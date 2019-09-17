@@ -1,3 +1,5 @@
+from sklearn.neighbors.kd_tree import KDTree
+
 from src.dsu import DisjointSetUnion
 from src.utils import *
 
@@ -20,7 +22,7 @@ class DBScan:
             for j in neighs:
                 dsu.merge(i, j)
 
-        if not ys:
+        if ys is None:
             ys = [0] * n_points
             current_cluster_id = 0
             for i in range(n_points):
