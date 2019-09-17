@@ -1,3 +1,4 @@
+import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -36,7 +37,7 @@ def clusters_statistics(flatten_image, cluster_colors, cluster_labels):
 
 
 def read_image(path: str):
-    raise NotImplementedError()
+    return np.flip(cv2.imread(path), 2)
 
 
 def show_image(image):
@@ -48,6 +49,4 @@ def show_image(image):
 
 
 def save_image(image, path):
-    raise NotImplementedError()
-
-
+    cv2.imwrite(path, np.flip(image, 2))
