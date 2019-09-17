@@ -11,26 +11,20 @@ class KMeans:
         self.n_clusters = n_clusters
         self.init = init
         self.max_iter = max_iter
+        self.centroids = None
 
-        self.centroid_crds = None
-        self.centroid_labels = None
-
-        self.kd_tree = None
-
-    def sample_init(self, xs: np.ndarray, ys: np.ndarray):
-        centroid_ids = np.arange(xs.shape[0])
-        np.random.shuffle(centroid_ids)
-        self.centroid_crds = np.array([xs[i] for i in centroid_ids])[:self.n_clusters]
-        self.centroid_labels = np.array([ys[i] for i in centroid_ids])[:self.n_clusters]
+    def sample_init(self, xs: np.ndarray):
+        self.centroids = xs.copy()
+        np.random.shuffle(self.centroids)
+        self.centroids = self.centroids[:self.n_clusters]
 
     def random_init(self, shape: typing.Tuple):
-        self.centroid_crds = np.random.random(shape)[:self.n_clusters]
-        self.centroid_labels = np.arange(self.n_clusters)
+        self.centroids = np.random.random(shape)[:self.n_clusters]
 
-    def k_means_plus_plus_init(self, xs: np.ndarray, ys: np.ndarray):
-        centroid_ids = [np.random.randint(0, xs.shape[0])]
+    def k_means_plus_plus_init(self, xs: np.ndarray):
+        self.centroids = [xs[np.random.randint(0, xs.shape[0])]]
         for i in range(1, self.n_clusters):
-            kd_tree = KDTree(np.array([xs[i] for i in centroid_ids]))
+            kd_tree = KDTree(np.array(self.centroids))
             dists, _ = kd_tree.query(X=xs)
             dists = np.array([d ** 2 for d in dists[:, 0]])
 
@@ -41,35 +35,41 @@ class KMeans:
                 cur_sum_d += dists[next_c]
                 next_c += 1
 
-            centroid_ids.append(next_c)
+            self.centroids.append(xs[next_c])
 
-        self.centroid_crds = np.array([xs[i] for i in centroid_ids])
-        self.centroid_labels = np.array([ys[i] for i in centroid_ids])
+        self.centroids = np.array(self.centroids)
 
-    def shift_centroid(self):
+    def shift_centroids(self, xs: np.ndarray):
         for _ in range(self.max_iter):
-            
+            kd_tree = KDTree(self.centroids)
+            _, cs = kd_tree.query(X=xs)
+            mass_centers = [np.zeros(xs.shape[1:]) for _ in range(self.n_clusters)]
+            cluster_size = [0] * self.n_clusters
+            for i in range(xs.shape[0]):
+                c = int(cs[i])
+                mass_centers[c] += xs[i]
+                cluster_size[c] += 1
+            for c in range(self.n_clusters):
+                mass_centers[c] /= cluster_size[c]
+            self.centroids = np.array(mass_centers)
 
-    def fit(self, xs: np.ndarray, ys: np.ndarray = None):
-        if ys is None:
-            ys = np.arange(xs.shape[0])
-
+    def fit(self, xs: np.ndarray):
         if self.init == 'random':
             self.random_init(xs.shape)
         elif self.init == 'sample':
-            self.sample_init(xs, ys)
+            self.sample_init(xs)
         elif self.init == 'k-means++':
-            self.k_means_plus_plus_init(xs, ys)
+            self.k_means_plus_plus_init(xs)
         else:
             raise Exception(f'Unrecognised init type: {self.init}')
+        self.shift_centroids(xs)
 
     def predict(self, xs: np.ndarray):
+        kd_tree = KDTree(self.centroids)
         while True:
-            if not self.kd_tree:
-                self.kd_tree = KDTree(self.centroid_crds)
-            _, cs = self.kd_tree.query(xs)
+            _, cs = kd_tree.query(xs)
             result = cs[:, 0]
             if np.unique(result).shape[0] != self.n_clusters:
                 continue
             else:
-                return np.array([self.centroid_labels[c] for c in result])
+                return result

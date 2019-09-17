@@ -6,16 +6,9 @@ from src.k_means import KMeans
 
 
 def visualize_clasters(X, labels):
-    label_id = {}
-    current_label_id = 0
-    for l in labels:
-        if l not in label_id:
-            label_id[l] = current_label_id
-            current_label_id += 1
-
     unique_labels = np.unique(labels)
     unique_colors = np.random.random((len(unique_labels), 3))
-    colors = [unique_colors[label_id[l]] for l in labels]
+    colors = [unique_colors[l] for l in labels]
     plt.figure(figsize=(9, 9))
     plt.scatter(X[:, 0], X[:, 1], c=colors)
     plt.show()
@@ -68,23 +61,26 @@ def clusterize_image(image):
 
     height, width, color_bytes = image.shape
 
-    xs = np.array([[[i, j] for j in range(width)] for i in range(height)]).reshape((height * width, 2))
+    xs = np.array([[[i, j, image[i][j][0], image[i][j][1], image[i][j][2]] for j in range(width)] for i in range(height)]).reshape((height * width, 5))
     ys = image.reshape((height * width, color_bytes))
 
     mean = np.mean(xs, axis=0)
     std = np.std(xs, axis=0)
-
     xs = (xs - mean) / std
 
-    kmeans = KMeans(n_clusters=16, init='k-means++')
-    kmeans.fit(xs, ys)
+    kmeans = KMeans(n_clusters=100, init='k-means++', max_iter=10)
+    kmeans.fit(xs)
 
     labels = kmeans.predict(xs)
 
-    # print(labels)
-    # print(labels.shape)
+    cluster_colors = [0] * kmeans.n_clusters
 
-    return labels.reshape((height, width, color_bytes))
+    for i in range(xs.shape[0]):
+        cluster_colors[labels[i]] = ys[i]
+
+    recolored = np.array([cluster_colors[c] for c in labels])
+
+    return recolored.reshape((height, width, color_bytes))
 
     # clusters_statistics(image.reshape(-1, 3), cluster_colors, clusters)  # Very slow (:
     # return recolored

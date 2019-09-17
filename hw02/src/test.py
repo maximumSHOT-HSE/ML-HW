@@ -20,11 +20,10 @@ if __name__ == '__main__':
     # save_image(result, "../resources/result_without_shift.jpg")
 
     # X_1, true_labels = make_blobs(400, 2, centers=[[0, 0], [-4, 0], [3.5, 3.5], [3.5, -2.0]])
-    # # visualize_clasters(X_1, true_labels)
+    # visualize_clasters(X_1, true_labels)
     # X_2, true_labels = make_moons(400, noise=0.075)
-    # # visualize_clasters(X_2, true_labels)
-    #
-    # kmeans = KMeans(n_clusters=4, init='k-means++')
+    # visualize_clasters(X_2, true_labels)
+    # kmeans = KMeans(n_clusters=4, init='sample', max_iter=10)
     # kmeans.fit(X_1)
     # labels = kmeans.predict(X_1)
     # visualize_clasters(X_1, labels)
@@ -32,4 +31,4 @@ if __name__ == '__main__':
     image = read_image("../resources/image.jpg")
     result = clusterize_image(image)
     show_image(result)
-    save_image(result, "result")
+    save_image(result, "../resources/result.jpg")
