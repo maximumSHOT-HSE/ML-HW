@@ -1,12 +1,4 @@
-from sklearn.neighbors import KDTree
-from sklearn.datasets import make_blobs, make_moons, make_swiss_roll
 import numpy as np
-import random
-import matplotlib.pyplot as plt
-import matplotlib
-import copy
-import cv2
-from collections import deque
 
 from src.dsu import DisjointSetUnion
 
@@ -55,6 +47,7 @@ class AgglomerativeClustering:
                 else:
                     raise Exception(f'Unrecognized linkage type: {self.linkage}')
                 dists[q][k] = dists[k][q] = d_now_k
+
         if not ys:
             current_cluster_label = 0
             ys = [0] * n_xs
@@ -62,4 +55,5 @@ class AgglomerativeClustering:
                 if dsu.find(i) == i:
                     ys[i] = current_cluster_label
                     current_cluster_label += 1
+
         return [ys[dsu.find(p)] for p in range(n_xs)]

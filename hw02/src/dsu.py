@@ -1,14 +1,3 @@
-from sklearn.neighbors import KDTree
-from sklearn.datasets import make_blobs, make_moons, make_swiss_roll
-import numpy as np
-import random
-import matplotlib.pyplot as plt
-import matplotlib
-import copy
-import cv2
-from collections import deque
-
-
 class DisjointSetUnion:
 
     def __init__(self, n_vertices: int):
