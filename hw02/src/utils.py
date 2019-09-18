@@ -61,22 +61,17 @@ def clusterize_image(image):
 
     height, width, color_bytes = image.shape
 
-    xs = np.array([[[i, j, image[i][j][0], image[i][j][1], image[i][j][2]] for j in range(width)] for i in range(height)]).reshape((height * width, 5))
-    ys = image.reshape((height * width, color_bytes))
+    xs = image.reshape((height * width, color_bytes))
 
-    mean = np.mean(xs, axis=0)
-    std = np.std(xs, axis=0)
-    xs = (xs - mean) / std
+    _min = xs.min(axis=0)
+    _max = xs.max(axis=0)
+    xs = (xs - _min) / (_max - _min)
 
-    kmeans = KMeans(n_clusters=100, init='k-means++', max_iter=10)
+    kmeans = KMeans(n_clusters=64, init='k-means++', max_iter=300)
     kmeans.fit(xs)
 
     labels = kmeans.predict(xs)
-
-    cluster_colors = [0] * kmeans.n_clusters
-
-    for i in range(xs.shape[0]):
-        cluster_colors[labels[i]] = ys[i]
+    cluster_colors = (kmeans.centroids * (_max - _min) + _min).astype(int)
 
     recolored = np.array([cluster_colors[c] for c in labels])
 
