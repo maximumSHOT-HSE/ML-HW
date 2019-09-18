@@ -55,14 +55,9 @@ def save_image(image, path):
 
 
 def clusterize_image(image):
-    cluster_colors = None  # color of each cluster
-    clusters = None  # Cluster labels for each pixel in flattened image
-    recolored = None  # Image with pixel colors assigned to corresponding cluster colors
-
     height, width, color_bytes = image.shape
 
-    xs = image.reshape((height * width, color_bytes))
-
+    xs = image.reshape((-1, color_bytes))
     _min = xs.min(axis=0)
     _max = xs.max(axis=0)
     xs = (xs - _min) / (_max - _min)
@@ -70,12 +65,11 @@ def clusterize_image(image):
     kmeans = KMeans(n_clusters=64, init='k-means++', max_iter=300)
     kmeans.fit(xs)
 
-    labels = kmeans.predict(xs)
-    cluster_colors = (kmeans.centroids * (_max - _min) + _min).astype(int)
+    clusters = kmeans.predict(xs)
+    cluster_colors = kmeans.centroids
+    clusters_statistics(xs, cluster_colors, clusters)  # Very slow (:
 
-    recolored = np.array([cluster_colors[c] for c in labels])
+    cluster_colors = (cluster_colors * (_max - _min) + _min).astype(int)
+    recolored = np.array([cluster_colors[c] for c in clusters]).reshape((height, width, color_bytes))
 
-    return recolored.reshape((height, width, color_bytes))
-
-    # clusters_statistics(image.reshape(-1, 3), cluster_colors, clusters)  # Very slow (:
-    # return recolored
+    return recolored

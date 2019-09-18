@@ -28,7 +28,7 @@ if __name__ == '__main__':
     # labels = kmeans.predict(X_1)
     # visualize_clasters(X_1, labels)
 
-    image = read_image("../resources/image.jpg")
+    image = read_image("resources/image.jpg")
     result = clusterize_image(image)
     show_image(result)
-    save_image(result, "../resources/result.jpg")
+    save_image(result, "resources/result.jpg")
