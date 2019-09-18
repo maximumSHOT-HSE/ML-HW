@@ -12,7 +12,6 @@ class KMeans:
         self.init = init
         self.max_iter = max_iter
         self.centroids = None
-        self.EPSILON = 1e-9
 
     def sample_init(self, xs: np.ndarray):
         self.centroids = xs.copy()
@@ -52,10 +51,7 @@ class KMeans:
                 cluster_size[c] += 1
             for c in range(self.n_clusters):
                 mass_centers[c] /= cluster_size[c]
-            mass_centers = np.array(mass_centers)
-            if np.linalg.norm(mass_centers - self.centroids) < self.EPSILON:
-                break
-            self.centroids = mass_centers
+            self.centroids = np.array(mass_centers)
 
     def fit(self, xs: np.ndarray):
         if self.init == 'random':
