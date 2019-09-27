@@ -31,33 +31,36 @@ class DecisionTreeClassifier:
         for dim in range(xs.shape[1]):
             ids.sort(key=lambda i: xs[i][dim])
             for j in range(xs.shape[0]):
-                if j + 1 < xs.shape[0] and xs[ids[j]][dim] == xs[ids[j + 1]][dim] or \
-                        min(j + 1, xs.shape[0] - j - 1) < self.min_samples_leaf:
+                separator = xs[j][dim]
+
+                left_y = np.array([ys[ids[q]] for q in range(j + 1) if xs[ids[q]][dim] < separator])
+                right_y = np.array([ys[ids[q]] for q in range(j + 1, xs.shape[0]) if xs[ids[q]][dim] >= separator])
+
+                if left_y.shape[0] < self.min_samples_leaf or right_y.shape[0] < self.min_samples_leaf:
                     continue
-                left_y = np.array([ys[ids[q]] for q in range(j + 1)])
-                right_y = np.array([ys[ids[q]] for q in range(j + 1, xs.shape[0])])
+
                 ig = gain(left_y, right_y, self.criterion)
 
                 if best_dim == -1 or ig > best_ig:
                     best_ig = ig
                     best_dim = dim
-                    best_separator = j
+                    best_separator = separator
 
         if best_dim == -1:
             return DecisionTreeLeaf(ys)
 
         ids.sort(key=lambda i: xs[i][best_dim])
 
-        left_xs = np.array([xs[ids[q]] for q in range(best_separator + 1)])
-        left_ys = np.array([ys[ids[q]] for q in range(best_separator + 1)])
+        left_xs = np.array([xs[q] for q in ids if xs[q][best_dim] < best_separator])
+        left_ys = np.array([ys[q] for q in ids if xs[q][best_dim] < best_separator])
 
-        right_xs = np.array([xs[ids[q]] for q in range(best_separator + 1, xs.shape[0])])
-        right_ys = np.array([ys[ids[q]] for q in range(best_separator + 1, xs.shape[0])])
+        right_xs = np.array([xs[q] for q in ids if xs[q][best_dim] >= best_separator])
+        right_ys = np.array([ys[q] for q in ids if xs[q][best_dim] >= best_separator])
 
         left_son = self.build_tree(left_xs, left_ys, depth + 1)
         right_son = self.build_tree(right_xs, right_ys, depth + 1)
 
-        return DecisionTreeNode(best_dim, xs[best_separator + 1][best_dim], left_son, right_son)
+        return DecisionTreeNode(best_dim, best_separator, left_son, right_son)
 
     def fit(self, xs: np.ndarray, ys: np.ndarray):
         ys = ys.reshape(ys.size)
@@ -83,11 +86,11 @@ class DecisionTreeClassifier:
             return node.y, ''
         if x[node.split_dim] < node.split_value:
             y, s = self.explain(x, node.left)
-            s += f'\nx[{node.split_dim}] < {node.split_value}'
+            s += f'\nx[{node.split_dim}] = {x[node.split_dim]} < {node.split_value}'
             return y, s
         else:
             y, s = self.explain(x, node.right)
-            s += f'\nx[{node.split_dim}] >= {node.split_dim}'
+            s += f'\nx[{node.split_dim}] = {x[node.split_dim]} >= {node.split_dim}'
             return y, s
 
 

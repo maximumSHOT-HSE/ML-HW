@@ -9,6 +9,7 @@ import math
 
 
 def calc_probabilities(labels: np.ndarray) -> np.ndarray:
+    labels = labels.reshape(labels.size)
     n_labels = labels.shape[0]
     occur = dict()
     for label in labels:

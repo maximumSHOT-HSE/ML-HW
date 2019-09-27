@@ -15,6 +15,7 @@ class DecisionTreeLeaf:
             occur[k] /= ys.shape[0]
         self.probabilities = occur
         self.y = max(self.probabilities.keys(), key=lambda label: self.probabilities[label])
+        self.size = ys.size
 
 
 class DecisionTreeNode:
@@ -23,3 +24,4 @@ class DecisionTreeNode:
         self.split_value = split_value
         self.left = left
         self.right = right
+        self.size = left.size + right.size

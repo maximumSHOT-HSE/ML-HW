@@ -112,11 +112,8 @@ def read_dataset(path):
 
 
 X, y = read_dataset("../train.csv")
-_min = X.min(axis=0)
-_max = X.max(axis=0)
-X = (X - _min) / (_max - _min)
 
-ratio = 0.9
+ratio = 0.5
 sep = int(ratio * X.shape[0])
 
 X_train = X[:sep]
@@ -125,10 +122,10 @@ y_train = y[:sep]
 X_test = X[sep:]
 y_test = y[sep:]
 
-tree = DecisionTreeClassifier(max_depth=3)
+tree = DecisionTreeClassifier(max_depth=6, min_samples_leaf=10)
 tree.fit(X_train, y_train)
-plot_2d(tree, X_test, y_test)
-draw_tree(tree)
+# plot_2d(tree, X_test, y_test)
+# draw_tree(tree)
 
 y_pred = tree.predict(X_test)
 
