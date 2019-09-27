@@ -28,8 +28,8 @@ def entropy(labels: np.ndarray):
 
 
 def gain(left_y: np.ndarray, right_y: np.ndarray, criterion):
-    left_size = left_y.shape[0]
-    right_size = right_y.shape[0]
-    return (left_size + right_size) * criterion(np.concatenate(left_y, right_y)) - \
+    left_size = left_y.size
+    right_size = right_y.size
+    return (left_size + right_size) * criterion(np.concatenate((left_y, right_y))) - \
            (left_size * criterion(left_y)) - \
            (right_size * criterion(right_y))
