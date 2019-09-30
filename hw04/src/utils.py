@@ -8,6 +8,8 @@ import copy
 from catboost import CatBoostClassifier
 import typing
 
+from src.random_forest_classifier import RandomForestClassifier
+
 
 def gini(x: np.ndarray):
     _, counts = np.unique(x, return_counts=True)
@@ -25,3 +27,11 @@ def gain(left_y: np.ndarray, right_y: np.ndarray, criterion):
     y = np.concatenate((left_y, right_y))
     return criterion(y) - (criterion(left_y) * len(left_y) + criterion(right_y) * len(right_y)) / len(y)
 
+
+def feature_importance(rfc: RandomForestClassifier):
+    return np.sum(tree.out_of_bag_error() for tree in rfc.forest) / rfc.n_estimators
+
+
+def most_important_features(importance, names, k: int = 20):
+    idicies = np.argsort(importance)[::-1][:k]
+    return np.array(names)[idicies]

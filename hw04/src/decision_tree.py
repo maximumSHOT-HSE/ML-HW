@@ -69,7 +69,7 @@ class DecisionTree:
         self.xs = xs
         self.ys = ys
         self.bag = bagging(len(xs))
-        self.out_of_bad = out_of_bag(len(xs), self.bag)
+        self.out_of_bag = out_of_bag(len(xs), self.bag)
         self.root = self.build_tree(self.xs[self.bag], self.ys[self.bag])
 
     def build_tree(self, xs: np.ndarray, ys: np.ndarray, depth: int = 0):
@@ -127,3 +127,17 @@ class DecisionTree:
     def predict(self, xs: np.ndarray) -> np.ndarray:
         probabilities = self.predict_probabilities(xs)
         return np.array([max(p.keys(), key=lambda k: p[k]) for p in probabilities])
+
+    def out_of_bag_error(self):
+        xs = self.xs[self.out_of_bag]
+        ys = self.ys[self.out_of_bag]
+        y_pred = self.predict(xs)
+        err = sum(1 for y, i in enumerate(ys) if y != y_pred[i])
+        errors = []
+        for j in range(xs.shape[1]):
+            xsj = xs.copy()
+            np.random.shuffle(xsj[:, j])
+            y_pred = self.predict(xsj)
+            err_j = sum(1 for y, i in enumerate(ys) if y != y_pred[i])
+            errors.append(err_j - err)
+        return np.array(errors)

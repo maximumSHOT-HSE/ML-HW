@@ -29,7 +29,12 @@ class RandomForestClassifier:
         self.n_estimators = n_estimators
         self.forest: typing.List[DecisionTree] = []
 
+        self.xs = None
+        self.ys = None
+
     def fit(self, xs: np.ndarray, ys: np.ndarray):
+        self.xs = xs
+        self.ys = ys
         self.forest.clear()
         for _ in range(self.n_estimators):
             self.forest.append(
