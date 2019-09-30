@@ -1,5 +1,6 @@
 import typing
 
+import math
 import numpy as np
 
 from src.decision_tree import DecisionTree
@@ -11,7 +12,7 @@ class RandomForestClassifier:
             criterion: str = 'gini',
             max_depth: int = None,
             min_samples_leaf: int = 1,
-            max_features ='auto',
+            max_features='auto',
             n_estimators: int = 10
     ):
         self.criterion = criterion

@@ -10,7 +10,7 @@ def out_of_bag(size, ids: np.ndarray) -> np.ndarray:
     used = set()
     for i in ids:
         used.add(i)
-    return np.array([i not in used for i in range(size)])
+    return np.array([i for i in range(size) if i not in used])
 
 
 def bagging(size: int) -> np.ndarray:
@@ -65,7 +65,7 @@ class DecisionTree:
         self.root = self.build_tree(self.xs[self.bag], self.ys[self.bag])
 
     def build_tree(self, xs: np.ndarray, ys: np.ndarray, depth: int = 0):
-        if np.sort(np.unique(ys)).size == 1 or depth == self.max_depth:
+        if np.unique(np.sort(ys)).size == 1 or depth == self.max_depth:
             return DecisionTreeLeaf(ys)
 
         best_dim = -1
@@ -78,8 +78,8 @@ class DecisionTree:
 
         for dim in dims:
 
-            left_y = np.array([ys[ids[q]] for q in ids if ys[ids[q]] == 0])
-            right_y = np.array([ys[ids[q]] for q in ids if ys[ids[q]] == 1])
+            left_y = np.array([ys[ids[q]] for q in ids if xs[ids[q]][dim] == 0])
+            right_y = np.array([ys[ids[q]] for q in ids if xs[ids[q]][dim] == 1])
 
             if left_y.shape[0] < self.min_samples_leaf or right_y.shape[0] < self.min_samples_leaf:
                 continue
@@ -93,11 +93,11 @@ class DecisionTree:
         if best_dim == -1:
             return DecisionTreeLeaf(ys)
 
-        left_xs = np.array([xs[ids[q]][best_dim] for q in ids if ys[ids[q]] == 0])
-        left_ys = np.array([ys[ids[q]] for q in ids if ys[ids[q]] == 0])
+        left_xs = np.array([xs[ids[q]] for q in ids if xs[ids[q]][best_dim] == 0])
+        left_ys = np.array([ys[ids[q]] for q in ids if xs[ids[q]][best_dim] == 0])
 
-        right_xs = np.array([xs[ids[q]][best_dim] for q in ids if ys[ids[q]] == 1])
-        right_ys = np.array([ys[ids[q]] for q in ids if ys[ids[q]] == 1])
+        right_xs = np.array([xs[ids[q]] for q in ids if xs[ids[q]][best_dim] == 1])
+        right_ys = np.array([ys[ids[q]] for q in ids if xs[ids[q]][best_dim] == 1])
 
         left_son = self.build_tree(left_xs, left_ys, depth + 1)
         right_son = self.build_tree(right_xs, right_ys, depth + 1)
@@ -123,12 +123,12 @@ class DecisionTree:
         xs = self.xs[self.out_of_bag]
         ys = self.ys[self.out_of_bag]
         y_pred = self.predict(xs)
-        err = sum(1 for y, i in enumerate(ys) if y != y_pred[i])
+        err = sum(1 for i, y in enumerate(ys) if y != y_pred[i])
         errors = []
         for j in range(xs.shape[1]):
             xsj = xs.copy()
             np.random.shuffle(xsj[:, j])
             y_pred = self.predict(xsj)
-            err_j = sum(1 for y, i in enumerate(ys) if y != y_pred[i])
-            errors.append(err_j - err)
+            err_j = sum(1 for i, y in enumerate(ys) if y != y_pred[i])
+            errors.append((err_j - err) / len(ys))
         return np.array(errors)

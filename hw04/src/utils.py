@@ -4,13 +4,13 @@ import numpy as np
 def gini(x: np.ndarray):
     _, counts = np.unique(x, return_counts=True)
     proba = counts / len(x)
-    return np.sum(proba * (1 - proba))
+    return sum(proba * (1 - proba))
 
 
 def entropy(x: np.ndarray):
     _, counts = np.unique(x, return_counts=True)
     proba = counts / len(x)
-    return -np.sum(proba * np.log2(proba))
+    return -sum(proba * np.log2(proba))
 
 
 def gain(left_y: np.ndarray, right_y: np.ndarray, criterion):
