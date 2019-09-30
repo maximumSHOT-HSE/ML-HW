@@ -1,15 +1,7 @@
-from sklearn.model_selection import train_test_split
-import numpy as np
-import pandas
-import random
-import matplotlib.pyplot as plt
-import matplotlib
-import copy
-from catboost import CatBoostClassifier
 import typing
-import math
 
-from src.utils import *
+import numpy as np
+
 from src.decision_tree import DecisionTree
 
 
@@ -50,4 +42,4 @@ class RandomForestClassifier:
 
     def predict(self, xs: np.ndarray) -> np.ndarray:
         votes = np.array([tree.predict(xs) for tree in self.forest])
-        return np.array([np.argmax(np.bincount(votes[:, i])) for i in range(xs.shape[1])])
+        return np.array([np.argmax(np.bincount(votes[:, i])) for i in range(votes.shape[1])])

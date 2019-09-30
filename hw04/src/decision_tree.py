@@ -1,15 +1,9 @@
-from sklearn.model_selection import train_test_split
-import numpy as np
-import pandas
-import random
-import matplotlib.pyplot as plt
-import matplotlib
-import copy
-from catboost import CatBoostClassifier
 import typing
-import math
 
-from src.utils import *
+import math
+import numpy as np
+
+from src.utils import gini, entropy, gain
 
 
 def out_of_bag(size, ids: np.ndarray) -> np.ndarray:
@@ -43,12 +37,10 @@ class DecisionTreeLeaf:
 
 
 class DecisionTreeNode:
-    def __init__(self, split_dim, split_value, left, right):
+    def __init__(self, split_dim, left, right):
         self.split_dim = split_dim
-        self.split_value = split_value
         self.left = left
         self.right = right
-        self.size = left.size + right.size
 
 
 class DecisionTree:
@@ -77,7 +69,6 @@ class DecisionTree:
             return DecisionTreeLeaf(ys)
 
         best_dim = -1
-        best_separator = -1
         best_ig = 0
         ids = [i for i in range(xs.shape[0])]
 
@@ -111,12 +102,12 @@ class DecisionTree:
         left_son = self.build_tree(left_xs, left_ys, depth + 1)
         right_son = self.build_tree(right_xs, right_ys, depth + 1)
 
-        return DecisionTreeNode(best_dim, best_separator, left_son, right_son)
+        return DecisionTreeNode(best_dim, left_son, right_son)
 
     def get_probabilities(self, x: np.ndarray, node) -> dict:
         if isinstance(node, DecisionTreeLeaf):
             return node.probabilities
-        if x[node.split_dim] < node.split_value:
+        if x[node.split_dim] == 0:
             return self.get_probabilities(x, node.left)
         else:
             return self.get_probabilities(x, node.right)
