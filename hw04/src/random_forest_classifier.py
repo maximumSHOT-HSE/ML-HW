@@ -6,6 +6,22 @@ import numpy as np
 from src.decision_tree import DecisionTree
 
 
+def majority(a: np.ndarray):
+    count = dict()
+    for x in a:
+        if x in count:
+            count[x] += 1
+        else:
+            count[x] = 1
+    best_key = -1
+    best_value = -1
+    for key, value in count.items():
+        if value > best_value:
+            best_value = value
+            best_key = key
+    return best_key
+
+
 class RandomForestClassifier:
     def __init__(
             self,
@@ -43,4 +59,4 @@ class RandomForestClassifier:
 
     def predict(self, xs: np.ndarray) -> np.ndarray:
         votes = np.array([tree.predict(xs) for tree in self.forest])
-        return np.array([np.argmax(np.bincount(votes[:, i])) for i in range(votes.shape[1])])
+        return np.array([majority(votes[:, i]) for i in range(votes.shape[1])])
