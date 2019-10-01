@@ -20,7 +20,7 @@ class DecisionTreeClassifier:
         self.criterion = gini if criterion == "gini" else entropy
 
     def build_tree(self, xs: np.ndarray, ys: np.ndarray, depth: int = 0):
-        if np.sort(np.unique(ys)).size == 1 or depth == self.max_depth:
+        if np.unique(np.sort(ys)).size == 1 or depth == self.max_depth:
             return DecisionTreeLeaf(ys)
 
         best_dim = -1
