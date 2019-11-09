@@ -36,7 +36,7 @@ class ReLU(Module):
         pass
 
     def forward(self, x):
-        pass
+        return np.vectorize(lambda t: max(t, 0))(x)
 
     def backward(self, d):
         pass
@@ -47,7 +47,7 @@ class Softmax(Module):
         pass
 
     def forward(self, x):
-        pass
+        return scipy.special.softmax(x)
 
     def backward(self, d):
         pass
